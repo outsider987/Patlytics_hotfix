@@ -1,28 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Patlytics Brand Colors */
+  --bg-cream: #F5F2EA;
+  --text-dark: #0F2C1F;
+  --text-muted: #4A5D53;
+  --green-accent: #59A645;
+  --green-dark: #132f22;
+  --card-white: #FFFFFF;
+  --card-border: #E0E5E0;
+
+  /* Typography */
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: light;
+  color: var(--text-dark);
+  background-color: var(--bg-cream);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
 }
 
 body {
@@ -31,64 +34,101 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--bg-cream);
+  color: var(--text-dark);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-serif);
+  color: var(--text-dark);
+  margin: 0;
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 2.5rem;
   line-height: 1.1;
+  font-weight: 500;
 }
 
 button {
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
-  font-size: 1em;
+  font-size: 0.9em;
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  font-family: var(--font-sans);
+  background-color: var(--green-dark);
+  color: white;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 button:hover {
-  border-color: #646cff;
+  background-color: var(--text-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-
-  a:hover {
-    color: #747bff;
-  }
-
-  button {
-    background-color: #f9f9f9;
-  }
+button.secondary {
+  background-color: white;
+  border: 1px solid var(--card-border);
+  color: var(--text-dark);
 }
 
-/* ReactFlow Controls - Terminal Theme */
+button.secondary:hover {
+  border-color: var(--green-accent);
+  color: var(--green-accent);
+  background-color: white;
+}
+
+select,
+input,
+textarea {
+  background-color: var(--card-white);
+  border: 1px solid var(--card-border);
+  color: var(--text-dark);
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  transition: border-color 0.2s;
+}
+
+select:focus,
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--green-accent);
+  box-shadow: 0 0 0 3px rgba(89, 166, 69, 0.1);
+}
+
+/* ReactFlow Controls - Professional Theme */
 .react-flow__controls {
-  background: #000 !important;
-  border: 1px solid #00ff00 !important;
-  border-radius: 0 !important;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3) !important;
+  background: white !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  padding: 4px !important;
 }
 
 .react-flow__controls-button {
-  background: #000 !important;
+  background: white !important;
   border: none !important;
-  border-bottom: 1px solid #003300 !important;
+  border-bottom: 1px solid #f0f0f0 !important;
   width: 28px !important;
   height: 28px !important;
-  padding: 5px !important;
+  border-radius: 4px !important;
+  color: var(--text-muted) !important;
 }
 
 .react-flow__controls-button:last-child {
@@ -96,15 +136,31 @@ button:focus-visible {
 }
 
 .react-flow__controls-button:hover {
-  background: #001a00 !important;
+  background: #f9f9f9 !important;
+  color: var(--green-accent) !important;
 }
 
 .react-flow__controls-button svg {
-  fill: #00ff00 !important;
+  fill: currentColor !important;
   max-width: 14px !important;
   max-height: 14px !important;
 }
 
-.react-flow__controls-button:hover svg {
-  fill: #00ff88 !important;
+/* Custom Scrollbar for Panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
 }

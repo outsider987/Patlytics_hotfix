@@ -11,6 +11,7 @@ export const ACTION_TYPES = {
     ENTER_NODE: 'ENTER_NODE',
     CHECK_IN_STACK: 'CHECK_IN_STACK',
     CYCLE_FOUND: 'CYCLE_FOUND',
+    SKIP_CYCLE: 'SKIP_CYCLE',
     CHECK_VISITED: 'CHECK_VISITED',
     SKIP_VISITED: 'SKIP_VISITED',
     ADD_TO_STACK: 'ADD_TO_STACK',
@@ -104,6 +105,7 @@ export const useCycleDetection = () => {
         const recursionStack = new Set();
         const pathStack = [];
         const stepsLog = [];
+        const skippedEdges = []; // Track all skipped back-edges
 
         // Helper to capture current state
         const captureState = (action, node, explanation, explanationZh, extra = {}) => {
@@ -145,17 +147,25 @@ export const useCycleDetection = () => {
                 captureState(
                     ACTION_TYPES.CYCLE_FOUND,
                     currentNode,
-                    `[!] FATAL: cycle detected @ node[${currentNode}] | path: ${pathStack.join('->')}->${currentNode}`,
-                    `致命錯誤：在節點 ${currentNode} 發現循環`,
+                    `[!] CYCLE DETECTED @ node[${currentNode}] | path: ${pathStack.join('->')}->${currentNode}`,
+                    `偵測到循環：節點 ${currentNode}`,
                     { isCycle: true, cycleNode: currentNode }
                 );
-                // Identify the back-edge
+                // Record the back-edge that causes cycle
                 const sourceNode = pathStack[pathStack.length - 1];
-                return {
-                    found: true,
-                    culprit: currentNode,
-                    cycleEdge: { source: sourceNode, target: currentNode }
-                };
+                const backEdge = { source: sourceNode, target: currentNode };
+                skippedEdges.push(backEdge);
+
+                captureState(
+                    ACTION_TYPES.SKIP_CYCLE,
+                    currentNode,
+                    `[✓] SKIP edge[${sourceNode}]->[${currentNode}] -- avoiding infinite loop`,
+                    `跳過邊 ${sourceNode}->${currentNode}，避免無限迴圈`,
+                    { skippedEdge: backEdge }
+                );
+
+                // Return found but continue - don't propagate up immediately
+                return { found: true, cycleEdge: backEdge, skipped: true };
             }
 
             captureState(
@@ -198,9 +208,8 @@ export const useCycleDetection = () => {
                 );
 
                 const result = dfs(neighborStr);
-                if (result.found) {
-                    return result;
-                }
+                // Don't stop on cycle - just record and continue to next neighbor
+                // The cycle is already logged and edge is marked as skipped
             }
 
             captureState(
@@ -231,16 +240,19 @@ export const useCycleDetection = () => {
 
         const result = dfs(startNode);
 
-        if (result.found) {
-            const loopStartIndex = pathStack.indexOf(result.culprit);
-            const actualLoop = pathStack.slice(loopStartIndex);
-            actualLoop.push(result.culprit);
+        if (skippedEdges.length > 0) {
+            // Cycles were found but handled by skipping
+            captureState(
+                ACTION_TYPES.COMPLETE,
+                startNode,
+                `[✓] COMPLETE: traversal finished. ${skippedEdges.length} cycle(s) detected and skipped.`,
+                `完成：遍歷結束。偵測到 ${skippedEdges.length} 個循環並成功跳過。`
+            );
 
             return {
                 found: true,
-                path: pathStack,
-                loopPath: actualLoop,
-                cycleEdge: result.cycleEdge,
+                handled: true, // Indicates cycles were found but handled
+                skippedEdges: skippedEdges,
                 steps: stepsLog
             };
         }
